@@ -1,7 +1,7 @@
-import { build } from "./builder";
-import { commitAndPushPublish, pullPublish } from "./git";
-import { log } from "./logger";
-import { pause } from "./util";
+import { build } from "./lib/builder";
+import { commitAndPushPublish, pullPublish } from "./lib/git";
+import { log } from "./lib/logger";
+import { pause } from "./lib/util";
 
 await pullPublish().catch(async err => {
     log.red(err)
