@@ -1,33 +1,14 @@
-import { spawn } from "child_process";
+import { build } from "./builder";
+import { loadConfig } from "./config";
 import { pause } from "./util";
 
-const vsDevCmd = `C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\Common7\\Tools\\VsDevCmd.bat`;
-const project = "./TahlildadehMVC/TahlildadehMvc.csproj";
-const profile = "FolderProfile";
-const command = `"${vsDevCmd}" && msbuild "${project}" /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=${profile}`;
+// build()
+//   .then(() => {
+//     console.log("Build and publish finished!");
+//   })
+//   .catch((err) => console.error("Error:", err.message));
 
-async function build() {
-  await new Promise<void>((resolve, reject) => {
-    const cmd = spawn(command, {
-      stdio: "inherit",
-      shell: true
-    });
+let config = await loadConfig()
+console.log(config)
 
-    cmd.on("exit", (code) => {
-      if (code === 0) resolve();
-      else reject(new Error(`Process exited with code ${code}`));
-    });
-
-    cmd.on("error", (err) => {
-      reject(err);
-    });
-  });
-}
-
-build()
-  .then(() => {
-    console.log("Build and publish finished!");
-  })
-  .catch((err) => console.error("Error:", err.message));
-
-await pause()
+// await pause()
