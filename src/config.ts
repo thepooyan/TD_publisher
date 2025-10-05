@@ -17,7 +17,10 @@ export interface config {
     publishPath: string;
 }
 
+let cacheConfig:config | null = null;
+
 export async function loadConfig() {
+  if (cacheConfig !== null) return cacheConfig
   const appDataPath = process.env.APPDATA || path.join(process.env.HOME || ".", ".config");
   const configDir = path.join(appDataPath, STATIC.appname);
   const configPath = path.join(configDir, STATIC.configFile);
@@ -30,6 +33,7 @@ export async function loadConfig() {
       const config = JSON.parse(content) as config;
       console.log("Config loaded:", config);
       rl.close();
+      cacheConfig = config;
       return config;
     } catch {
         throw new Error(`Invalid config file: ${configPath}`)
@@ -61,5 +65,6 @@ export async function loadConfig() {
   fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2));
   console.log("Config saved:", newConfig);
   rl.close();
+  cacheConfig = newConfig;
   return newConfig;
 }
