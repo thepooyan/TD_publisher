@@ -1,6 +1,7 @@
 import { build } from "./builder";
 import { commitAndPushPublish, pullPublish } from "./git";
-import { log, pause } from "./util";
+import { log } from "./logger";
+import { pause } from "./util";
 
 await pullPublish().catch(async err => {
     log.red(err)

@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import readline from "readline";
 import { STATIC } from "./const";
-import { log } from "./util";
+import { log } from "./logger";
 
 const rl = readline.createInterface({
   input: process.stdin,
