@@ -1,7 +1,8 @@
 import { spawn } from "child_process";
+import { pause } from "./util";
 
 const vsDevCmd = `C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\Common7\\Tools\\VsDevCmd.bat`;
-const project = "TahlildadehMvc.csproj";
+const project = "./TahlildadehMVC/TahlildadehMvc.csproj";
 const profile = "FolderProfile";
 const command = `"${vsDevCmd}" && msbuild "${project}" /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=${profile}`;
 
@@ -28,3 +29,5 @@ run()
     console.log("Build and publish finished!");
   })
   .catch((err) => console.error("Error:", err.message));
+
+await pause()
