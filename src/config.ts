@@ -14,6 +14,7 @@ function askQuestion(question: string): Promise<string> {
 
 export interface config {
     vsPath: string;
+    publishPath: string;
 }
 
 export async function loadConfig() {
@@ -44,9 +45,19 @@ export async function loadConfig() {
     }
     return vsPath
   }
+  const getPublishPath = async () => {
+    const pubPath = await askQuestion(`\nPlease Enter your publish folder address: \n`);
+    if (!fs.existsSync(pubPath)) {
+        console.log("Wrong address. try again.")
+        return await getPublishPath()
+    }
+    return pubPath
+  }
 
   const vsPath = await getVsPath()
-  const newConfig = { vsPath } as config;
+  const publishPath = await getPublishPath()
+  const newConfig:config = { vsPath , publishPath };
+
   fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2));
   console.log("Config saved:", newConfig);
   rl.close();

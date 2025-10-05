@@ -8,4 +8,4 @@ build()
   .catch((err) => console.error("Error:", err.message));
 
 
-await pause()
+// await pause()
