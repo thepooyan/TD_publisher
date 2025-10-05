@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import readline from "readline";
 import { STATIC } from "./const";
-import { exit } from "process";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -53,5 +52,3 @@ export async function loadConfig() {
   rl.close();
   return newConfig;
 }
-
-loadConfig();
