@@ -2,22 +2,27 @@ import { build } from "./builder";
 import { commitAndPushPublish, pullPublish } from "./git";
 import { log, pause } from "./util";
 
-await pullPublish().catch(err => {
+await pullPublish().catch(async err => {
     console.log(err)
     log.red("Failed to pull the publish repository.")
+    await pause()
     process.exit()
 })
 
-
-build()
-  .then(() => {
+await build()
+.then(() => {
     log.green("Build and publish finished!");
-  })
-  .catch((err) => log.red(`Error: ${err.message}`));
+})
+.catch(async err => {
+    log.red(`Error: ${err.message}`)
+    await pause()
+    process.exit()
+});
 
-await commitAndPushPublish().catch(err => {
+await commitAndPushPublish().catch(async err => {
     console.log(err)
     log.red("Failed to commit and push new changes")
+    await pause()
     process.exit()
 })
 
