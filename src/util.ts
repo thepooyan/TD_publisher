@@ -11,7 +11,7 @@ export async function pause(msg: string = "Press any key to continue...") {
   })
 }
 
-type colors = "red" | "green"
+type colors = "red" | "green" | "blue"
 
 const colorLogger = (color: colors) => (msg: string) => {console.log(chalk[color](msg))}
 
@@ -19,12 +19,14 @@ type LogFn = {
   (msg: string): void
   red: (msg: string) => void
   green: (msg: string) => void
+  blue: (msg: string) => void
 }
 
 const generateLog = (): LogFn => {
   const log = ((msg: string) => console.log(msg)) as LogFn
   log.red = colorLogger("red")
   log.green = colorLogger("green")
+  log.blue = colorLogger("blue")
   return log
 }
 

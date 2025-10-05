@@ -3,18 +3,22 @@ import { exec } from "child_process"
 import { promisify } from "util"
 import { log } from "./util"
 
-const execAsync = promisify(exec)
+const execAsync = async (command: string) => {
+    const {stdout} = await promisify(exec)(command)
+    log(stdout)
+}
 
 export const pullPublish = async () => {
     const config = await loadConfig()
     const publishDir = config.publishPath
 
     try {
+        log.blue("Running git pull on publish...")
         await execAsync(`git -C "${publishDir}" pull`)
-        console.log("Git pull successful")
+        log.green("Git pull successful")
     } catch (err: any) {
-        console.error("Git pull failed:", err.message)
-        console.log("Resetting local changes and force pulling from remote...")
+        log.red(`Git pull failed: ${err.message} `)
+        log.blue("Resetting local changes and force pulling from remote...")
 
         await execAsync(`git -C "${publishDir}" restore .`)
         await execAsync(`git -C "${publishDir}" clean -df`)
