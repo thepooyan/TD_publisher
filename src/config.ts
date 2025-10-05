@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import readline from "readline";
 import { STATIC } from "./const";
+import { log } from "./util";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -32,7 +33,8 @@ export async function loadConfig() {
     const content = fs.readFileSync(configPath, "utf-8");
     try {
       const config = JSON.parse(content) as config;
-      console.log("Config loaded:", config);
+      log.green("Config loaded:");
+      console.log(config)
       rl.close();
       cacheConfig = config;
       return config;
@@ -45,7 +47,7 @@ export async function loadConfig() {
     const vsPath = await askQuestion(`Please Enter your visual studio installation path (example: C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise)\n => `);
     const vsDev = path.join(vsPath , STATIC.vsDevPath)
     if (!fs.existsSync(vsDev)) {
-        console.log("Wrong address. try again.")
+        log.red("Wrong address. try again.")
         return await getVsPath()
     }
     return vsPath
@@ -53,7 +55,7 @@ export async function loadConfig() {
   const getPublishPath = async () => {
     const pubPath = await askQuestion(`\nPlease Enter your publish folder address: \n`);
     if (!fs.existsSync(pubPath)) {
-        console.log("Wrong address. try again.")
+        log.red("Folder does not exist! try again.")
         return await getPublishPath()
     }
     return pubPath
@@ -65,7 +67,8 @@ export async function loadConfig() {
   const newConfig:config = { vsPath , publishPath, author };
 
   fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2));
-  console.log("Config saved:", newConfig);
+  log.green("Config saved:");
+  console.log(newConfig)
   rl.close();
   cacheConfig = newConfig;
   return newConfig;

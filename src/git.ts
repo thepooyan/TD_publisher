@@ -24,7 +24,7 @@ export const pullPublish = async () => {
         await execAsync(`git -C "${publishDir}" clean -df`)
         await execAsync(`git -C "${publishDir}" fetch --all`)
         await execAsync(`git -C "${publishDir}" reset --hard origin/master`)
-        console.log("Local repository replaced with remote successfully")
+        log.green("Local repository replaced with remote successfully")
     }
 }
 
@@ -36,13 +36,15 @@ export const commitAndPushPublish = async () => {
     const publishDir = config.publishPath
 
     try {
+        log.blue("Commiting and pushing new changes to remote...")
         await execAsync(`git -C "${publishDir}" add .`)
         await execAsync(`git -C "${publishDir}" commit -m "${generateCommitMsg(config.author)}"`)
         await execAsync(`git -C "${publishDir}" push origin master`)
         log.green("Commit and push successfull!")
     } catch(e: any) {
+        log.red("Error while commit/push new changes")
         log(e)
-        log("Reverting changes...")
+        log.blue("Reverting changes...")
         await execAsync(`git -C "${publishDir}" restore .`)
         await execAsync(`git -C "${publishDir}" clean -df`)
         throw new Error(e)
