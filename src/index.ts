@@ -6,7 +6,7 @@ const project = "./TahlildadehMVC/TahlildadehMvc.csproj";
 const profile = "FolderProfile";
 const command = `"${vsDevCmd}" && msbuild "${project}" /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=${profile}`;
 
-async function run() {
+async function build() {
   await new Promise<void>((resolve, reject) => {
     const cmd = spawn(command, {
       stdio: "inherit",
@@ -24,7 +24,7 @@ async function run() {
   });
 }
 
-run()
+build()
   .then(() => {
     console.log("Build and publish finished!");
   })
