@@ -24,15 +24,23 @@ export const pullPublish = async () => {
     }
 }
 
+const getDate = () => new Date().toLocaleString("fa").toString()
+const generateCommitMsg = (author: string) => `${getDate()} - by ${author}`
+
 export const commitAndPushPublish = async () => {
     const config = await loadConfig()
     const publishDir = config.publishPath
 
     try {
-        await execAsync(`git -C "${publishDir}" commit -m "test"`)
-        log.green("Git pull successful")
+        await execAsync(`git -C "${publishDir}" add .`)
+        await execAsync(`git -C "${publishDir}" commit -m "${generateCommitMsg("taha")}"`)
+        await execAsync(`git -C "${publishDir}" push origin master`)
+        log.green("Commit and push successfull!")
     } catch(e: any) {
+        log(e)
         log("Reverting changes...")
+        await execAsync(`git -C "${publishDir}" restore .`)
+        await execAsync(`git -C "${publishDir}" clean -df`)
         throw new Error(e)
     }
 }
