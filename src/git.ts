@@ -33,7 +33,7 @@ export const commitAndPushPublish = async () => {
 
     try {
         await execAsync(`git -C "${publishDir}" add .`)
-        await execAsync(`git -C "${publishDir}" commit -m "${generateCommitMsg("taha")}"`)
+        await execAsync(`git -C "${publishDir}" commit -m "${generateCommitMsg(config.author)}"`)
         await execAsync(`git -C "${publishDir}" push origin master`)
         log.green("Commit and push successfull!")
     } catch(e: any) {

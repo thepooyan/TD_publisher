@@ -15,6 +15,7 @@ function askQuestion(question: string): Promise<string> {
 export interface config {
     vsPath: string;
     publishPath: string;
+    author: string;
 }
 
 let cacheConfig:config | null = null;
@@ -60,7 +61,8 @@ export async function loadConfig() {
 
   const vsPath = await getVsPath()
   const publishPath = await getPublishPath()
-  const newConfig:config = { vsPath , publishPath };
+  const author = await askQuestion("Please enter your name: ")
+  const newConfig:config = { vsPath , publishPath, author };
 
   fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2));
   console.log("Config saved:", newConfig);
