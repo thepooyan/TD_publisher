@@ -1,4 +1,7 @@
+import { isDevelopment } from "./const"
+
 export async function pause(msg: string = "Press any key to continue...") {
+  if (isDevelopment) return
   return new Promise<void>(resolve => {
     process.stdin.resume()
     process.stdout.write(msg)
@@ -7,4 +10,13 @@ export async function pause(msg: string = "Press any key to continue...") {
       resolve()
     })
   })
+}
+
+export const exit = () => {
+  process.exit()
+}
+
+export const waitForExit = async (msg?: string) => {
+  await pause(msg)
+  exit()
 }

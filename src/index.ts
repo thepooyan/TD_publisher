@@ -1,13 +1,12 @@
 import { build } from "./lib/builder";
 import { commitAndPushPublish, pullPublish } from "./lib/git";
 import { log } from "./lib/logger";
-import { pause } from "./lib/util";
+import { pause, waitForExit } from "./lib/util";
 
 await pullPublish().catch(async err => {
     log.red(err)
     log.red("Failed to pull the publish repository.")
-    await pause()
-    process.exit()
+    await waitForExit()
 })
 
 await build()
@@ -15,16 +14,14 @@ await build()
     log.green("Build and publish finished!");
 })
 .catch(async err => {
-    log.red(`Error: ${err.message}`)
-    await pause()
-    process.exit()
+    log.red(err)
+    log.red("Failed to build the project")
+    await waitForExit()
 });
 
 await commitAndPushPublish().catch(async err => {
     log.red(err)
     log.red("Failed to commit and push new changes")
-    await pause()
-    process.exit()
+    await waitForExit()
 })
-
 await pause()
