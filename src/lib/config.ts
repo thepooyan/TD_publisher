@@ -3,6 +3,7 @@ import path from "path";
 import readline from "readline";
 import { STATIC } from "./const";
 import { log } from "./logger";
+import z, { string } from "zod";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -13,13 +14,18 @@ function askQuestion(question: string): Promise<string> {
   return new Promise((resolve) => rl.question(question, resolve));
 }
 
-export interface config {
-    vsPath: string;
-    publishPath: string;
-    author: string;
-}
 
 let cacheConfig:config | null = null;
+
+const configSchema = z.object({
+  vsPath: string().nonempty(),
+  author: string().nonempty()
+})
+type config = z.infer<typeof configSchema>
+
+export const parseConfig = (config: any) => {
+  return configSchema.parse(config)
+}
 
 export async function loadConfig() {
   if (cacheConfig !== null) return cacheConfig
@@ -32,12 +38,13 @@ export async function loadConfig() {
   if (fs.existsSync(configPath)) {
     const content = fs.readFileSync(configPath, "utf-8");
     try {
-      const config = JSON.parse(content) as config;
+      const config = JSON.parse(content);
       log.green("Config loaded:");
       console.log(config)
       rl.close();
-      cacheConfig = config;
-      return config;
+      let parsed = parseConfig(config)
+      cacheConfig = parsed;
+      return parsed;
     } catch {
         throw new Error(`Invalid config file: ${configPath}`)
     }
@@ -62,9 +69,8 @@ export async function loadConfig() {
   }
 
   const vsPath = await getVsPath()
-  const publishPath = await getPublishPath()
   const author = await askQuestion("Please enter your name: ")
-  const newConfig:config = { vsPath , publishPath, author };
+  const newConfig:config = { vsPath , author };
 
   fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2));
   log.green("Config saved:");
