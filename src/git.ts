@@ -1,7 +1,7 @@
 import { loadConfig } from "./config"
 import { exec } from "child_process"
 import { promisify } from "util"
-import { log } from "./util"
+import { log } from "./logger"
 
 const execAsync = async (command: string) => {
     const {stdout} = await promisify(exec)(command)
