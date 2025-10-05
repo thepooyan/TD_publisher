@@ -7,9 +7,9 @@ const command = `"${vsDevCmd}" && msbuild "${project}" /p:Configuration=Release 
 
 async function run() {
   await new Promise<void>((resolve, reject) => {
-    const cmd = spawn(command, { // Pass the whole command here
+    const cmd = spawn(command, {
       stdio: "inherit",
-      shell: true // And use shell: true
+      shell: true
     });
 
     cmd.on("exit", (code) => {
