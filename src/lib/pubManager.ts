@@ -34,7 +34,6 @@ const parseFileContent = (content: string) => {
         let xmlParsed = new XMLParser().parse(content)
         let schemaParsed = schema.parse(xmlParsed)
         let dir = schemaParsed.Project.PropertyGroup.PublishUrl
-        console.log(dir)
         if (!hasGit(dir)) return null
         return dir
     } catch {
