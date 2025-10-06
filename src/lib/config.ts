@@ -43,7 +43,7 @@ const makeNewConfig = async (): Promise<config> => {
   const getVsPath = async (): Promise<string> => {
     while (true) {
       const vsPath = await prompt(
-        `Please Enter your Visual Studio installation path (example: C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise)\n => `
+        `Please Enter your Visual Studio installation path (example: C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise)`
       )
       const vsDev = path.join(vsPath, STATIC.vsDevPath)
       if (fs.existsSync(vsDev)) return vsPath
