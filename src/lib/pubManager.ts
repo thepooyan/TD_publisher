@@ -1,4 +1,4 @@
-import { loadConfig } from "./config";
+import { loadConfig, type config } from "./config";
 import { XMLParser } from "fast-xml-parser"
 import {log} from "./logger"
 import fs, { existsSync } from "fs"
@@ -11,13 +11,10 @@ import { execSync } from "child_process";
 
 let publishProfileCache:returnType | null = null;
 
-type returnType = {
-    profileName: string
-    publishFolder: string
-}
+type returnType = config["defaultPublishProfile"]
 
-export const getPublishProfile = async () => {
-    if (!publishProfileCache) publishProfileCache = await selectPublishProfile()
+export const getPublishProfile = async (projectPath: string) => {
+    if (!publishProfileCache) publishProfileCache = await selectPublishProfile(projectPath)
     return publishProfileCache
 }
 
@@ -41,9 +38,8 @@ const parseFileContent = (content: string) => {
     }
 }
 
-const selectPublishProfile = async () => {
-    const config = await loadConfig()
-    const pubPath = path.join(config.projectPath, STATIC.pubProfilesPath)
+const selectPublishProfile = async (projectPath: string) => {
+    const pubPath = path.join(projectPath, STATIC.pubProfilesPath)
     const files = readdirSync(pubPath, {withFileTypes: true})
     const profilesMap = new Map<number, string>()
     let index = 1

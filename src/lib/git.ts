@@ -10,7 +10,7 @@ const execAsync = async (command: string) => {
 
 export const pullPublish = async () => {
     const config = await loadConfig()
-    const publishDir = config.publishPath
+    const publishDir = config.defaultPublishProfile
 
     try {
         log.blue("Running git pull on publish...")

@@ -4,10 +4,6 @@ import { log } from "./lib/logger";
 import { getPublishProfile } from "./lib/pubManager";
 import { exit, pause, waitForExit } from "./lib/util";
 
-let a = await getPublishProfile()
-console.log(a)
-exit()
-
 await pullPublish().catch(async err => {
     log.red(err)
     log.red("Failed to pull the publish repository.")

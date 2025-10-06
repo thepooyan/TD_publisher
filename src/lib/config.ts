@@ -5,6 +5,7 @@ import { log } from "./logger";
 import z, { string } from "zod";
 import { waitForExit } from "./util";
 import { prompt } from "./prompt";
+import { getPublishProfile } from "./pubManager";
 
 const getConfigPath = () => {
   const appDataPath = process.env.APPDATA || path.join(process.env.HOME || ".", ".config");
@@ -21,8 +22,12 @@ const configSchema = z.object({
   vsPath: string().nonempty(),
   author: string().nonempty(),
   projectPath: string().nonempty(),
+  defaultPublishProfile: {
+    profileName: string().nonempty(),
+    publishFolder: string().nonempty()
+  }
 })
-type config = z.infer<typeof configSchema>
+export type config = z.infer<typeof configSchema>
 
 const saveConfig = (config: config) => {
   try {
@@ -58,8 +63,9 @@ const makeNewConfig = async (): Promise<config> => {
   const vsPath = await getVsPath()
   const author = await prompt("Please enter your name: ")
   const projectPath = await getProjectPath()
+  const defaultPublishProfile  = await getPublishProfile(projectPath)
 
-  return { vsPath, author, projectPath }
+  return { vsPath, author, projectPath, defaultPublishProfile }
 }
 
 const regenerateConfig = async () => {
