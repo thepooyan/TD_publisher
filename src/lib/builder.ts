@@ -7,8 +7,8 @@ import { STATIC } from "./const";
 export async function build() {
   const config = await loadConfig()
   const vsDevCmd = path.join(config.vsPath, STATIC.vsDevPath);
-  const project = "./TahlildadehMVC/TahlildadehMvc.csproj";
-  const profile = "FolderProfile";
+  const project = path.join(config.projectPath,`/TahlildadehMVC/TahlildadehMvc.csproj`);
+  const profile = path.basename(config.defaultPublishProfile.profileName, path.extname(config.defaultPublishProfile.profileName));
   const command = `"${vsDevCmd}" && msbuild "${project}" /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=${profile}`;
 
   await new Promise<void>((resolve, reject) => {
