@@ -33,38 +33,6 @@ const configSchema = z.object({
 })
 type config = z.infer<typeof configSchema>
 
-export const parseConfig = (config: any) => {
-  return configSchema.parse(config)
-}
-
-export async function loadConfig() {
-  if (cacheConfig !== null) return cacheConfig
-
-  if (fs.existsSync(configPath)) {
-    const content = fs.readFileSync(configPath, "utf-8");
-    try {
-      const config = JSON.parse(content);
-      log.green("Config loaded:");
-      console.log(config)
-      rl.close();
-      let parsed = parseConfig(config)
-      cacheConfig = parsed;
-      return parsed;
-    } catch {
-        log.red(`Invalid config file: ${configPath}`)
-        log.blue("regenerating config...")
-        return await regenerateConfig()
-    }
-  } else {
-    if (!fs.existsSync(configDir)) fs.mkdirSync(configDir, { recursive: true });
-    const newConfig = await makeNewConfig()
-    saveConfig(newConfig)
-    rl.close();
-    cacheConfig = newConfig;
-    return newConfig;
-  }
-}
-
 const saveConfig = (config: config) => {
   try {
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
@@ -104,11 +72,42 @@ const makeNewConfig = async () => {
 
 const regenerateConfig = async () => {
   try {
-    const {configPath} = getConfigPath()
     fs.rmSync(configPath)
     return await makeNewConfig()
   } catch {
     log.red("Error while deleting config file. please remove it manually and start the program again.")
     return await waitForExit()
+  }
+}
+
+const readConfig = async () => {
+  const content = fs.readFileSync(configPath, "utf-8");
+  try {
+    const config = JSON.parse(content);
+    let parsed = configSchema.parse(config)
+    log.green("Config loaded:");
+    console.log(config)
+    rl.close();
+    cacheConfig = parsed;
+    return parsed;
+  } catch {
+    log.red(`Invalid config file: ${configPath}`)
+    log.blue("regenerating config...")
+    return await regenerateConfig()
+  }
+}
+
+export async function loadConfig() {
+  if (cacheConfig !== null) return cacheConfig
+
+  if (fs.existsSync(configPath)) {
+    return await readConfig()
+  } else {
+    if (!fs.existsSync(configDir)) fs.mkdirSync(configDir, { recursive: true });
+    const newConfig = await makeNewConfig()
+    saveConfig(newConfig)
+    rl.close();
+    cacheConfig = newConfig;
+    return newConfig;
   }
 }
