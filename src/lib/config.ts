@@ -36,10 +36,6 @@ const saveConfig = (config: config) => {
 }
 
 const makeNewConfig = async (): Promise<config> => {
-
-
-
-
   const getVsPath = async (): Promise<string> => {
     while (true) {
       const vsPath = await prompt(
