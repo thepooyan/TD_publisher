@@ -2,10 +2,11 @@ import { build } from "./lib/builder";
 import { loadConfig } from "./lib/config";
 import { commitAndPushPublish, pullPublish } from "./lib/git";
 import { log } from "./lib/logger";
-import { pause, waitForExit } from "./lib/util";
+import { getPublishProfile } from "./lib/pubManager";
+import { exit, pause, waitForExit } from "./lib/util";
 
-await loadConfig()
-process.exit()
+await getPublishProfile()
+exit()
 
 await pullPublish().catch(async err => {
     log.red(err)

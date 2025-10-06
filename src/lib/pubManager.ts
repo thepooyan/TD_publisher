@@ -10,13 +10,14 @@ export const getPublishProfile = async () => {
     return publishProfileCache
 }
 
-export const selectPublishProfile = async () => {
+const selectPublishProfile = async () => {
     const config = await loadConfig()
-    const pubPath = path.join(process.cwd(), STATIC.pubProfilesPath)
+    const pubPath = path.join(config.projectPath, STATIC.pubProfilesPath)
     const files = readdirSync(pubPath, {withFileTypes: true})
     console.log(pubPath)
-    files.forEach(file => {
-        console.log(path.extname(file.name))
-    })
+    for (const file of files) {
+        if (path.extname(file.name) !== ".pubxml") continue
+        console.log(file.name)
+    }
     return ""
 }
