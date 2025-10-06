@@ -1,5 +1,4 @@
 import { build } from "./lib/builder";
-import { loadConfig } from "./lib/config";
 import { commitAndPushPublish, pullPublish } from "./lib/git";
 import { log } from "./lib/logger";
 import { getPublishProfile } from "./lib/pubManager";
