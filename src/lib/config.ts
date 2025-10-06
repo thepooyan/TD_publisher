@@ -55,11 +55,19 @@ const makeNewConfig = async (): Promise<config> => {
       log.red("Wrong address. Try again.")
     }
   }
+  const getProjectPath = async (): Promise<string> => {
+    while (true) {
+      let prPath = await askQuestion( `Please enter your project path (. for current directory): `)
+      if (prPath === ".") prPath = process.cwd()
+      if (verifyProjectPath(prPath)) return prPath
+      log.red("Wrong address. Try again.")
+    }
+  }
 
   try {
     const vsPath = await getVsPath()
     const author = await askQuestion("Please enter your name: ")
-    const projectPath = await askQuestion("Please enter your project path (. for current directory): ")
+    const projectPath = await getProjectPath()
 
     return { vsPath, author, projectPath }
   } finally {
@@ -105,4 +113,11 @@ export async function loadConfig() {
     cacheConfig = newConfig;
     return newConfig;
   }
+}
+
+export const verifyProjectPath = (projectPath: string) => {
+  if (!fs.existsSync(projectPath)) return false
+  let pubPath = path.join(projectPath, STATIC.pubProfilesPath)
+  if (!fs.existsSync(pubPath)) return false
+  return true
 }
