@@ -35,38 +35,36 @@ const saveConfig = (config: config) => {
   }
 }
 
-const makeNewConfig = async () => {
+const makeNewConfig = async (): Promise<config> => {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-  });
+  })
+
   const askQuestion = (question: string): Promise<string> => {
-    return new Promise((resolve) => rl.question(question, resolve));
+    return new Promise((resolve) => rl.question(question, resolve))
   }
 
-  const getVsPath = async () => {
-    const vsPath = await askQuestion(`Please Enter your visual studio installation path (example: C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise)\n => `);
-    const vsDev = path.join(vsPath , STATIC.vsDevPath)
-    if (!fs.existsSync(vsDev)) {
-        log.red("Wrong address. try again.")
-        return await getVsPath()
+  const getVsPath = async (): Promise<string> => {
+    while (true) {
+      const vsPath = await askQuestion(
+        `Please Enter your Visual Studio installation path (example: C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise)\n => `
+      )
+      const vsDev = path.join(vsPath, STATIC.vsDevPath)
+      if (fs.existsSync(vsDev)) return vsPath
+      log.red("Wrong address. Try again.")
     }
-    return vsPath
-  }
-  const getPublishPath = async () => {
-    const pubPath = await askQuestion(`\nPlease Enter your publish folder address: \n`);
-    if (!fs.existsSync(pubPath)) {
-        log.red("Folder does not exist! try again.")
-        return await getPublishPath()
-    }
-    return pubPath
   }
 
-  const vsPath = await getVsPath()
-  const author = await askQuestion("Please enter your name: ")
-  const projectPath = await askQuestion("Please enter your project path: (. for current directory)")
-  const newConfig:config = { vsPath , author, projectPath };
-  return newConfig
+  try {
+    const vsPath = await getVsPath()
+    const author = await askQuestion("Please enter your name: ")
+    const projectPath = await askQuestion("Please enter your project path (. for current directory): ")
+
+    return { vsPath, author, projectPath }
+  } finally {
+    rl.close()
+  }
 }
 
 const regenerateConfig = async () => {
