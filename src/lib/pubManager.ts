@@ -1,11 +1,18 @@
 import { loadConfig } from "./config";
+import { XMLParser } from "fast-xml-parser"
+import fs from "fs"
 import path from "path"
 import { STATIC } from "./const";
-import { Dirent, readdirSync } from "fs";
-import { prompt, type askQ } from "./prompt";
+import { readdirSync } from "fs";
+import { prompt } from "./prompt";
 import { log } from "console";
 
-let publishProfileCache:string | null = null;
+let publishProfileCache:returnType | null = null;
+
+type returnType = {
+    profileName: string
+    publishFolder: string
+}
 
 export const getPublishProfile = async () => {
     if (!publishProfileCache) publishProfileCache = await selectPublishProfile()
@@ -24,12 +31,18 @@ const selectPublishProfile = async () => {
         const fullPath = path.join(pubPath, file.name)
         profilesMap.set(index, fullPath)
     }
-    let trg = null
+    let targetProfile = null
     do {
         let res = await prompt("which profile to use? (enter the number)")
-        trg = profilesMap.get(parseInt(res))
-    } while(!trg)
-    console.log(trg)
+        targetProfile = profilesMap.get(parseInt(res))
+    } while(!targetProfile)
         
-    return ""
+    const fileContent = fs.readFileSync(targetProfile, "utf-8")
+    let parsed = new XMLParser().parse(fileContent)
+    const publishFolder = parsed.Project.PropertyGroup.PublishUrl as string
+
+    return {
+        profileName: path.basename(targetProfile),
+        publishFolder: publishFolder
+    }
 }
