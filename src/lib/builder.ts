@@ -3,7 +3,6 @@ import { loadConfig } from "./config";
 import path from "path";
 import { STATIC } from "./const";
 
-
 export async function build() {
   const config = await loadConfig()
   const vsDevCmd = path.join(config.vsPath, STATIC.vsDevPath);

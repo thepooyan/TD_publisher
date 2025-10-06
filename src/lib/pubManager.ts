@@ -1,4 +1,4 @@
-import { loadConfig, type config } from "./config";
+import { type config } from "./config";
 import { XMLParser } from "fast-xml-parser"
 import {log} from "./logger"
 import fs, { existsSync } from "fs"
