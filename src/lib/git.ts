@@ -10,7 +10,7 @@ const execAsync = async (command: string) => {
 
 export const pullPublish = async () => {
     const config = await loadConfig()
-    const publishDir = config.defaultPublishProfile
+    const publishDir = config.defaultPublishProfile.publishFolder
 
     try {
         log.blue("Running git pull on publish...")
@@ -33,7 +33,7 @@ const generateCommitMsg = (author: string) => `${getDate()} - by ${author}`
 
 export const commitAndPushPublish = async () => {
     const config = await loadConfig()
-    const publishDir = config.publishPath
+    const publishDir = config.defaultPublishProfile.publishFolder
 
     try {
         log.blue("Commiting and pushing new changes to remote...")

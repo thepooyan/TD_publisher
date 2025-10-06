@@ -22,10 +22,10 @@ const configSchema = z.object({
   vsPath: string().nonempty(),
   author: string().nonempty(),
   projectPath: string().nonempty(),
-  defaultPublishProfile: {
+  defaultPublishProfile: z.object({
     profileName: string().nonempty(),
     publishFolder: string().nonempty()
-  }
+  })
 })
 export type config = z.infer<typeof configSchema>
 

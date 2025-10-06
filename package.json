@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development bun --watch run ./src/index.ts",
+    "lint": "tsc --noEmit",
     "build": "NODE_ENV=production bun build ./src/index.ts --compile --outfile ./dist/publisher.exe"
   },
   "devDependencies": {
