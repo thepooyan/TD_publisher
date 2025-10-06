@@ -12,12 +12,12 @@ export async function pause(msg: string = "Press any key to continue...") {
   })
 }
 
-export const exit = () => {
-  if (isDevelopment) throw new Error("Trigger restart")
+export const exit = ():never => {
+  // if (isDevelopment) throw new Error("Trigger restart")
   process.exit()
 }
 
-export const waitForExit = async (msg?: string) => {
+export const waitForExit = async (msg?: string):Promise<never> => {
   await pause(msg)
-  exit()
+  return exit()
 }
