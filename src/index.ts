@@ -25,4 +25,6 @@ await commitAndPushPublish().catch(async err => {
     log.red("Failed to commit and push new changes")
     await waitForExit()
 })
+
+log.green("Publish was successful!")
 await pause()
