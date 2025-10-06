@@ -1,11 +1,12 @@
 import { loadConfig } from "./config";
 import { XMLParser } from "fast-xml-parser"
+import {log} from "./logger"
 import fs from "fs"
 import path from "path"
 import { STATIC } from "./const";
 import { readdirSync } from "fs";
 import { prompt } from "./prompt";
-import { log } from "console";
+import z from "zod";
 
 let publishProfileCache:returnType | null = null;
 
@@ -19,6 +20,25 @@ export const getPublishProfile = async () => {
     return publishProfileCache
 }
 
+const schema = z.object({
+  Project: z.object({
+    PropertyGroup: z.object({
+      PublishUrl: z.string(),
+    })
+  })
+})
+
+const parseFileContent = (content: string) => {
+    try {
+        let xmlParsed = new XMLParser().parse(content)
+        let schemaParsed = schema.parse(xmlParsed)
+        //check if there is git there
+        return schemaParsed.Project.PropertyGroup.PublishUrl
+    } catch {
+        return null
+    }
+}
+
 const selectPublishProfile = async () => {
     const config = await loadConfig()
     const pubPath = path.join(config.projectPath, STATIC.pubProfilesPath)
@@ -27,19 +47,26 @@ const selectPublishProfile = async () => {
     let index = 1
     for (const file of files) {
         if (path.extname(file.name) !== ".pubxml") continue
-        log(`${index++}: ${file.name}`)
+        log(`${index}: ${file.name}`)
         const fullPath = path.join(pubPath, file.name)
         profilesMap.set(index, fullPath)
+        index++;
     }
     let targetProfile = null
+    let publishFolder = null
     do {
         let res = await prompt("which profile to use? (enter the number)")
         targetProfile = profilesMap.get(parseInt(res))
-    } while(!targetProfile)
+        if (!targetProfile) {
+            log.red("Invalid input.")
+            continue
+        }
+        const fileContent = fs.readFileSync(targetProfile, "utf-8")
+        publishFolder = parseFileContent(fileContent)
+        if (!publishFolder) log.red("Selected profile has no publish folder")
+    } while(!targetProfile || !publishFolder)
         
-    const fileContent = fs.readFileSync(targetProfile, "utf-8")
-    let parsed = new XMLParser().parse(fileContent)
-    const publishFolder = parsed.Project.PropertyGroup.PublishUrl as string
+
 
     return {
         profileName: path.basename(targetProfile),
