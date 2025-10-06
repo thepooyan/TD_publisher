@@ -1,12 +1,13 @@
 import { loadConfig } from "./config";
 import { XMLParser } from "fast-xml-parser"
 import {log} from "./logger"
-import fs from "fs"
+import fs, { existsSync } from "fs"
 import path from "path"
 import { STATIC } from "./const";
 import { readdirSync } from "fs";
 import { prompt } from "./prompt";
 import z from "zod";
+import { execSync } from "child_process";
 
 let publishProfileCache:returnType | null = null;
 
@@ -32,8 +33,10 @@ const parseFileContent = (content: string) => {
     try {
         let xmlParsed = new XMLParser().parse(content)
         let schemaParsed = schema.parse(xmlParsed)
-        //check if there is git there
-        return schemaParsed.Project.PropertyGroup.PublishUrl
+        let dir = schemaParsed.Project.PropertyGroup.PublishUrl
+        console.log(dir)
+        if (!hasGit(dir)) return null
+        return dir
     } catch {
         return null
     }
@@ -63,13 +66,21 @@ const selectPublishProfile = async () => {
         }
         const fileContent = fs.readFileSync(targetProfile, "utf-8")
         publishFolder = parseFileContent(fileContent)
-        if (!publishFolder) log.red("Selected profile has no publish folder")
+        if (!publishFolder) log.red("Selected profile has no publish folder or the publish folder has no git")
     } while(!targetProfile || !publishFolder)
-        
-
 
     return {
         profileName: path.basename(targetProfile),
         publishFolder: publishFolder
     }
 }
+
+const hasGit = (fullPath: string): boolean => {
+    if (!existsSync(fullPath)) return false;
+    try {
+      execSync("git rev-parse --is-inside-work-tree", { cwd: fullPath, stdio: "ignore" });
+      return true;
+    } catch {
+      return false;
+    }
+  };
