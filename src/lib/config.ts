@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
-import readline from "readline";
 import { STATIC } from "./const";
 import { log } from "./logger";
 import z, { string } from "zod";
 import { waitForExit } from "./util";
+import { prompt } from "./prompt";
 
 const getConfigPath = () => {
   const appDataPath = process.env.APPDATA || path.join(process.env.HOME || ".", ".config");
@@ -36,18 +36,13 @@ const saveConfig = (config: config) => {
 }
 
 const makeNewConfig = async (): Promise<config> => {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  })
 
-  const askQuestion = (question: string): Promise<string> => {
-    return new Promise((resolve) => rl.question(question, resolve))
-  }
+
+
 
   const getVsPath = async (): Promise<string> => {
     while (true) {
-      const vsPath = await askQuestion(
+      const vsPath = await prompt(
         `Please Enter your Visual Studio installation path (example: C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise)\n => `
       )
       const vsDev = path.join(vsPath, STATIC.vsDevPath)
@@ -57,22 +52,18 @@ const makeNewConfig = async (): Promise<config> => {
   }
   const getProjectPath = async (): Promise<string> => {
     while (true) {
-      let prPath = await askQuestion( `Please enter your project path (. for current directory): `)
+      let prPath = await prompt( `Please enter your project path (. for current directory): `)
       if (prPath === ".") prPath = process.cwd()
       if (verifyProjectPath(prPath)) return prPath
       log.red("Wrong address. Try again.")
     }
   }
 
-  try {
-    const vsPath = await getVsPath()
-    const author = await askQuestion("Please enter your name: ")
-    const projectPath = await getProjectPath()
+  const vsPath = await getVsPath()
+  const author = await prompt("Please enter your name: ")
+  const projectPath = await getProjectPath()
 
-    return { vsPath, author, projectPath }
-  } finally {
-    rl.close()
-  }
+  return { vsPath, author, projectPath }
 }
 
 const regenerateConfig = async () => {
