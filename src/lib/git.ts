@@ -2,6 +2,10 @@ import { loadConfig } from "./config"
 import { exec } from "child_process"
 import { promisify } from "util"
 import { log } from "./logger"
+import { determineError, errorTyes } from "./a"
+
+const config = await loadConfig()
+const publishDir = config.defaultPublishProfile.publishFolder
 
 const execAsync = async (command: string) => {
     const {stdout} = await promisify(exec)(command)
@@ -9,22 +13,37 @@ const execAsync = async (command: string) => {
 }
 
 export const pullPublish = async () => {
-    const config = await loadConfig()
-    const publishDir = config.defaultPublishProfile.publishFolder
-
+    let numberOfRetryts = 0;
     try {
         log.blue("Running git pull on publish...")
         await execAsync(`git -C "${publishDir}" pull`)
         log.green("Git pull successful")
     } catch (err: any) {
-        log.red(`Git pull failed: ${err.message} `)
-        log.blue("Resetting local changes and force pulling from remote...")
+        let errorType = determineError(err.stderr)
 
+        switch (errorType) {
+            case errorTyes.Internet:
+                break
+            case errorTyes.Unknown:
+            default:
+                log.red(`Git pull failed: ${err.stderr} `)
+                await revertPull()
+            break
+        }
+    }
+}
+
+const revertPull = async () => {
+    try {
+        log.blue("Resetting local changes and force pulling from remote...")
+        await execAsync(`git -C "${publishDir}" reset .`)
         await execAsync(`git -C "${publishDir}" restore .`)
         await execAsync(`git -C "${publishDir}" clean -df`)
         await execAsync(`git -C "${publishDir}" fetch --all`)
         await execAsync(`git -C "${publishDir}" reset --hard origin/master`)
         log.green("Local repository replaced with remote successfully")
+    } catch {
+
     }
 }
 
